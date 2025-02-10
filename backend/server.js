@@ -8,7 +8,7 @@ const ticketRoutes = require("./routes/ticketRoutes");
 const app = express();
 
 app.use(cors({
-  origin: "https://ferrytkt.onrender.com/", // Allow local frontend to access the backend
+  origin: "https://ferrytkt-1.onrender.com/", // Allow local frontend to access the backend
   methods: ["GET", "POST", "PUT", "DELETE"], // Add the methods you want to allow
   credentials: true, // If you need cookies/session
 }));
