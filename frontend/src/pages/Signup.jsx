@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import styles from "../styles/styles";
 import { API_URL } from "../utils/api";
 
-
 export default function Signup() {
   const [userData, setUserData] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
@@ -29,7 +28,9 @@ export default function Signup() {
         // Automatically log in the user by saving the userId in localStorage
         localStorage.setItem("userId", data.userId);
         localStorage.setItem("isLoggedIn", "true");
+        
         navigate("/"); // Redirect to home after successful signup
+        window.location.reload(); // Force UI update
       } else {
         setError(data.message || "Signup failed");
       }

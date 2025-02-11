@@ -1,7 +1,25 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import styles from "../styles/styles";
 
-export default function Navbar({ isLoggedIn, handleLogout }) {
+export default function Navbar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("isLoggedIn") === "true");
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("userId");
+    localStorage.removeItem("isLoggedIn");
+    setIsLoggedIn(false);
+  };
+
   return (
     <nav style={styles.nav}>
       <ul style={styles.navList}>
