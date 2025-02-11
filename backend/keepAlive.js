@@ -1,5 +1,5 @@
-const cron = require("node-cron");
-const fetch = require("node-fetch");
+import cron from "node-cron";
+import fetch from "node-fetch";
 
 const BACKEND_URL = "https://ferrytkt.onrender.com/api/health"; // Use an existing API route
 
