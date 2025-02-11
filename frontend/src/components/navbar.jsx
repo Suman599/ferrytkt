@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import styles from "../styles/styles";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("isLoggedIn") === "true");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -18,6 +20,8 @@ export default function Navbar() {
     localStorage.removeItem("userId");
     localStorage.removeItem("isLoggedIn");
     setIsLoggedIn(false);
+    navigate("/"); // Redirect to home page after login
+    window.location.reload();
   };
 
   return (
