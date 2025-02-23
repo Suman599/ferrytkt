@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeSVG } from "qrcode.react";
 import styles from "../styles/styles.js";
 import { API_URL } from "../utils/api";
-
-
 
 function BookTicket() {
   const [route, setRoute] = useState("");
@@ -12,7 +10,8 @@ function BookTicket() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [qrCode, setQrCode] = useState(null);
-  const [totalPrice, setTotalPrice] = useState(0); // New state for total price
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [isBooking, setIsBooking] = useState(false); // Prevents multiple taps
   const navigate = useNavigate();
 
   const routePrices = {
@@ -28,6 +27,8 @@ function BookTicket() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isBooking) return; // Prevents multiple taps
+    setIsBooking(true);
     setError("");
     setSuccess("");
     setQrCode(null);
@@ -36,6 +37,7 @@ function BookTicket() {
       const userId = localStorage.getItem("userId");
       if (!userId) {
         setError("Please log in to book a ticket");
+        setIsBooking(false);
         return;
       }
 
@@ -49,26 +51,24 @@ function BookTicket() {
 
       if (response.ok) {
         setSuccess("Ticket booked successfully");
-        // Generate QR code
         const qrData = JSON.stringify({
           ticketId: data.ticket.id,
           route: data.ticket.route,
           quantity: data.ticket.quantity,
-          userId: userId,
+          userId,
         });
         setQrCode(qrData);
-        setTimeout(() => {
-          navigate("/tickets");
-        }, 5000);
+        setTimeout(() => navigate("/tickets"), 5000);
       } else {
         throw new Error(data.message);
       }
     } catch (error) {
       setError(`Error booking ticket: ${error.message}`);
+    } finally {
+      setIsBooking(false); // Enable button again
     }
   };
 
-  // Update total price when route or quantity changes
   const handleRouteChange = (e) => {
     setRoute(e.target.value);
     const price = routePrices[e.target.value] || 0;
@@ -87,6 +87,7 @@ function BookTicket() {
       <h2 style={styles.heading}>Book a Ferry Ticket</h2>
       {error && <div style={styles.error}>{error}</div>}
       {success && <div style={styles.success}>{success}</div>}
+
       <select value={route} onChange={handleRouteChange} required style={styles.select}>
         <option value="">Select Route</option>
         <option value="Dakhineswar-Belur Math">Dakhineswar-Belur Math (₹10)</option>
@@ -98,6 +99,7 @@ function BookTicket() {
         <option value="Serampore-Barrackpore">Serampore-Barrackpore (₹7)</option>
         <option value="Seoraphuli-Barrackpore">Seoraphuli-Barrackpore (₹6)</option>
       </select>
+
       <input
         type="number"
         value={quantity}
@@ -107,12 +109,15 @@ function BookTicket() {
         required
         style={styles.input}
       />
+
       <div style={{ marginTop: "10px", fontSize: "18px", color: "#333" }}>
         <strong>Total Price: ₹{totalPrice}</strong>
       </div>
-      <button type="submit" style={styles.button}>
-        Book Ticket
+
+      <button type="submit" style={styles.button} disabled={isBooking}>
+        {isBooking ? "Booking..." : "Book Ticket"}
       </button>
+
       {qrCode && (
         <div style={{ marginTop: "20px", textAlign: "center" }}>
           <h3>Your Ticket QR Code</h3>
